@@ -1,0 +1,29 @@
+#!/bin/bash
+# Each intro must play before exactly one still of the same name in its theme.
+# Usage: bin/check <omarchy checkout>
+
+set -euo pipefail
+
+omarchy=${1:?usage: bin/check <omarchy checkout>}
+cd "$(dirname "$0")/.."
+
+failed=0
+count=0
+for intro in */*.mp4; do
+  theme=${intro%%/*}
+  stem=${intro##*/}
+  stem=${stem%.mp4}
+  matches=0
+  for extension in jpg jpeg png bmp webp; do
+    [[ ! -f $omarchy/themes/$theme/backgrounds/$stem.$extension ]] || ((++matches))
+  done
+  if ((matches != 1)); then
+    echo "$intro: $matches matching stills in themes/$theme/backgrounds" >&2
+    failed=1
+  fi
+  ((++count))
+done
+
+((count > 0)) || { echo "no intros found" >&2; exit 1; }
+((failed == 0)) && echo "$count intros match their stills"
+exit $failed

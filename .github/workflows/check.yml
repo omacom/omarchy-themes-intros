@@ -1,0 +1,19 @@
+name: Check
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  stills:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: omacom/omarchy
+          ref: quattro
+          path: omarchy
+          sparse-checkout: themes
+      - run: bin/check omarchy
